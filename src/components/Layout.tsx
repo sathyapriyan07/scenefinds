@@ -18,7 +18,7 @@ const Header = () => {
       className="absolute top-0 left-0 right-0 z-20 flex items-center justify-between px-4 py-3 transition-all duration-500 bg-transparent"
     >
       <div className="flex items-center gap-12">
-        <Link to="/" className="flex items-center gap-2 group">
+        <Link to="/" onClick={() => window.location.reload()} className="flex items-center gap-2 group">
           <img src="/logo.png.png" alt="SceneFinds" className="w-10 h-10 transition-transform group-hover:scale-110" />
           <span className="text-xl font-bold tracking-tighter hidden sm:block font-display">SCENEFINDS</span>
         </Link>
