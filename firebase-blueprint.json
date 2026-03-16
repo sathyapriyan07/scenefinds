@@ -1,0 +1,81 @@
+{
+  "entities": {
+    "User": {
+      "title": "User",
+      "description": "User profile information",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string" },
+        "email": { "type": "string" },
+        "displayName": { "type": "string" },
+        "photoURL": { "type": "string" },
+        "role": { "type": "string", "enum": ["user", "admin"] }
+      },
+      "required": ["uid", "email"]
+    },
+    "WatchlistItem": {
+      "title": "WatchlistItem",
+      "description": "Item saved to user's watchlist",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string" },
+        "tmdbId": { "type": "number" },
+        "mediaType": { "type": "string", "enum": ["movie", "tv"] },
+        "title": { "type": "string" },
+        "posterPath": { "type": "string" },
+        "addedAt": { "type": "number" }
+      },
+      "required": ["userId", "tmdbId", "mediaType"]
+    },
+    "ContinueWatching": {
+      "title": "ContinueWatching",
+      "description": "Playback progress for a movie or episode",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string" },
+        "tmdbId": { "type": "number" },
+        "mediaType": { "type": "string", "enum": ["movie", "tv"] },
+        "title": { "type": "string" },
+        "posterPath": { "type": "string" },
+        "progress": { "type": "number" },
+        "season": { "type": "number" },
+        "episode": { "type": "number" },
+        "updatedAt": { "type": "number" }
+      },
+      "required": ["userId", "tmdbId", "mediaType", "progress"]
+    },
+    "HeroBanner": {
+      "title": "HeroBanner",
+      "description": "Custom hero banner for the homepage",
+      "type": "object",
+      "properties": {
+        "tmdbId": { "type": "number" },
+        "mediaType": { "type": "string" },
+        "titleLogo": { "type": "string" },
+        "customDescription": { "type": "string" },
+        "customBackdrop": { "type": "string" },
+        "isActive": { "type": "boolean" },
+        "order": { "type": "number" }
+      },
+      "required": ["tmdbId", "mediaType", "isActive", "order"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": "User",
+      "description": "User profiles"
+    },
+    "/watchlist/{itemId}": {
+      "schema": "WatchlistItem",
+      "description": "User watchlist items"
+    },
+    "/continue_watching/{progressId}": {
+      "schema": "ContinueWatching",
+      "description": "User playback progress"
+    },
+    "/hero_banners/{bannerId}": {
+      "schema": "HeroBanner",
+      "description": "Homepage hero banners"
+    }
+  }
+}
