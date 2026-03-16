@@ -6,8 +6,7 @@ import { Movie, Cast } from '../types';
 import { MovieRow } from '../components/MovieRow';
 import { CinematicHero } from '../components/CinematicHero';
 import { useAuth } from '../context/AuthContext';
-import { db } from '../firebase';
-import { doc, setDoc, deleteDoc, onSnapshot, collection, query, where } from 'firebase/firestore';
+import { addToWatchlist, isInWatchlist as checkIsInWatchlist, removeFromWatchlist } from '../services/supabaseDb';
 
 const MovieDetail = () => {
   const { id } = useParams<{ id: string }>();
@@ -63,36 +62,45 @@ const MovieDetail = () => {
   }, [id]);
 
   useEffect(() => {
-    if (!user || !id) return;
+    if (!user || !id) {
+      setIsInWatchlist(false);
+      return;
+    }
 
-    const q = query(
-      collection(db, 'watchlist'),
-      where('userId', '==', user.uid),
-      where('tmdbId', '==', parseInt(id))
-    );
+    let cancelled = false;
+    (async () => {
+      try {
+        const ok = await checkIsInWatchlist(user.id, parseInt(id), 'movie');
+        if (!cancelled) setIsInWatchlist(ok);
+      } catch (error) {
+        console.warn('Watchlist check failed:', error);
+      }
+    })();
 
-    const unsubscribe = onSnapshot(q, (snapshot) => {
-      setIsInWatchlist(!snapshot.empty);
-    });
-
-    return () => unsubscribe();
+    return () => {
+      cancelled = true;
+    };
   }, [user, id]);
 
   const toggleWatchlist = async () => {
     if (!user || !movie) return;
 
-    const watchlistId = `${user.uid}_${movie.id}`;
-    if (isInWatchlist) {
-      await deleteDoc(doc(db, 'watchlist', watchlistId));
-    } else {
-      await setDoc(doc(db, 'watchlist', watchlistId), {
-        userId: user.uid,
-        tmdbId: movie.id,
-        mediaType: 'movie',
-        title: movie.title,
-        posterPath: movie.poster_path,
-        addedAt: Date.now(),
-      });
+    try {
+      if (isInWatchlist) {
+        await removeFromWatchlist(user.id, movie.id, 'movie');
+        setIsInWatchlist(false);
+      } else {
+        await addToWatchlist({
+          userId: user.id,
+          tmdbId: movie.id,
+          mediaType: 'movie',
+          title: movie.title,
+          posterPath: movie.poster_path || null,
+        });
+        setIsInWatchlist(true);
+      }
+    } catch (error) {
+      console.error('Watchlist toggle failed:', error);
     }
   };
 

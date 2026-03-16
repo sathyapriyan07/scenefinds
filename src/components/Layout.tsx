@@ -2,7 +2,6 @@ import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { Home, Search, Menu, User } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
-import { signInWithGoogle } from '../firebase';
 import { clsx, type ClassValue } from 'clsx';
 import { twMerge } from 'tailwind-merge';
 
@@ -11,7 +10,7 @@ function cn(...inputs: ClassValue[]) {
 }
 
 const Header = () => {
-  const { user } = useAuth();
+  const { user, signInWithGoogle } = useAuth();
   const location = useLocation();
 
   return (
@@ -42,7 +41,9 @@ const Header = () => {
           </Link>
         ) : (
           <button 
-            onClick={() => signInWithGoogle()}
+            onClick={() => {
+              void signInWithGoogle().catch((e) => console.error('Sign in failed:', e));
+            }}
             className="text-sm font-bold bg-white text-black px-4 py-2 rounded-full hover:bg-zinc-200 transition-colors"
           >
             Sign In

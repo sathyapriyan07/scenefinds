@@ -1,11 +1,10 @@
 import React from 'react';
 import { useAuth } from '../context/AuthContext';
-import { auth } from '../firebase';
 import { LogOut, User as UserIcon, Shield, Bookmark, Clock } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 const Profile = () => {
-  const { user, isAdmin } = useAuth();
+  const { user, isAdmin, signOut } = useAuth();
   const navigate = useNavigate();
 
   if (!user) {
@@ -34,7 +33,7 @@ const Profile = () => {
                 </button>
               )}
               <button 
-                onClick={() => auth.signOut()}
+                onClick={() => signOut()}
                 className="flex items-center gap-2 bg-white/5 text-white border border-white/10 px-6 py-2 rounded-full font-bold text-sm hover:bg-white/10 transition-colors"
               >
                 <LogOut size={18} />

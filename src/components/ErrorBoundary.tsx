@@ -33,7 +33,7 @@ class ErrorBoundary extends React.Component<Props, State> {
       try {
         const parsedError = JSON.parse(this.state.error?.message || '{}');
         if (parsedError.error) {
-          errorMessage = `Firebase Error: ${parsedError.error}`;
+          errorMessage = `App Error: ${parsedError.error}`;
         }
       } catch {
         // Not a JSON error

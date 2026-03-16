@@ -4,8 +4,7 @@ import { MovieRow } from '../components/MovieRow';
 import { tmdbIsConfigured, tmdbService } from '../services/tmdb';
 import { Movie } from '../types';
 import { useAuth } from '../context/AuthContext';
-import { collection, query, where, getDocs, orderBy, limit } from 'firebase/firestore';
-import { db } from '../firebase';
+import { getContinueWatching } from '../services/supabaseDb';
 
 const Home = () => {
   const { user } = useAuth();
@@ -54,21 +53,14 @@ const Home = () => {
 
         if (user) {
           try {
-            const q = query(
-              collection(db, 'continue_watching'),
-              where('userId', '==', user.uid),
-              orderBy('updatedAt', 'desc'),
-              limit(10)
-            );
-            const snapshot = await getDocs(q);
-            const cwData = snapshot.docs.map(doc => {
-              const data = doc.data();
+            const rows = await getContinueWatching(user.id, 10);
+            const cwData = rows.map((data) => {
               return {
-                id: data.tmdbId,
-                tmdbId: data.tmdbId,
+                id: data.tmdb_id,
+                tmdbId: data.tmdb_id,
                 title: data.title,
-                poster_path: data.posterPath,
-                media_type: data.mediaType,
+                poster_path: data.poster_path || '',
+                media_type: data.media_type,
                 overview: '',
                 backdrop_path: '',
                 release_date: '',
@@ -78,30 +70,8 @@ const Home = () => {
             });
             setContinueWatching(cwData);
           } catch (cwError) {
-            console.warn('Continue watching query failed (likely missing index):', cwError);
-            // Fallback: fetch without ordering if index fails
-            const qSimple = query(
-              collection(db, 'continue_watching'),
-              where('userId', '==', user.uid),
-              limit(10)
-            );
-            const snapshotSimple = await getDocs(qSimple);
-            const cwDataSimple = snapshotSimple.docs.map(doc => {
-              const data = doc.data();
-              return {
-                id: data.tmdbId,
-                tmdbId: data.tmdbId,
-                title: data.title,
-                poster_path: data.posterPath,
-                media_type: data.mediaType,
-                overview: '',
-                backdrop_path: '',
-                release_date: '',
-                vote_average: 0,
-                genre_ids: []
-              } as Movie;
-            });
-            setContinueWatching(cwDataSimple);
+            console.warn('Continue watching query failed:', cwError);
+            setContinueWatching([]);
           }
         }
       } catch (error) {

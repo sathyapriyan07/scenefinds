@@ -1,10 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { useAuth } from '../context/AuthContext';
-import { db } from '../firebase';
-import { collection, query, where, onSnapshot, orderBy } from 'firebase/firestore';
 import { Movie } from '../types';
 import { PosterCard } from '../components/MovieRow';
 import { Bookmark } from 'lucide-react';
+import { getWatchlist } from '../services/supabaseDb';
 
 const Watchlist = () => {
   const { user, loading: authLoading } = useAuth();
@@ -12,41 +11,43 @@ const Watchlist = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (!user) {
-      setLoading(false);
-      return;
-    }
+    let cancelled = false;
 
-    const q = query(
-      collection(db, 'watchlist'),
-      where('userId', '==', user.uid),
-      orderBy('addedAt', 'desc')
-    );
+    (async () => {
+      if (!user) {
+        setLoading(false);
+        return;
+      }
 
-    const unsubscribe = onSnapshot(q, (snapshot) => {
-      const items = snapshot.docs.map(doc => {
-        const data = doc.data();
-        return {
-          id: data.tmdbId,
-          tmdbId: data.tmdbId,
-          title: data.title,
-          poster_path: data.posterPath,
-          media_type: data.mediaType,
-          overview: '',
-          backdrop_path: '',
-          release_date: '',
-          vote_average: 0,
-          genre_ids: []
-        } as Movie;
-      });
-      setWatchlist(items);
-      setLoading(false);
-    }, (error) => {
-      console.error('Watchlist error:', error);
-      setLoading(false);
-    });
+      try {
+        setLoading(true);
+        const rows = await getWatchlist(user.id);
+        if (cancelled) return;
+        const items = rows.map((data) => {
+          return {
+            id: data.tmdb_id,
+            tmdbId: data.tmdb_id,
+            title: data.title,
+            poster_path: data.poster_path || '',
+            media_type: data.media_type,
+            overview: '',
+            backdrop_path: '',
+            release_date: '',
+            vote_average: 0,
+            genre_ids: []
+          } as Movie;
+        });
+        setWatchlist(items);
+      } catch (error) {
+        console.error('Watchlist error:', error);
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
+    })();
 
-    return () => unsubscribe();
+    return () => {
+      cancelled = true;
+    };
   }, [user]);
 
   if (authLoading || loading) {

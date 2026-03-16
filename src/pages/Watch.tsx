@@ -2,10 +2,9 @@ import React, { useEffect, useRef, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { ArrowLeft, Maximize2, Minimize2, Volume2, VolumeX } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
-import { db } from '../firebase';
-import { doc, setDoc } from 'firebase/firestore';
 import { tmdbService } from '../services/tmdb';
 import { Movie } from '../types';
+import { upsertContinueWatching } from '../services/supabaseDb';
 
 const Watch = () => {
   const { id, season, episode } = useParams<{ id: string; season?: string; episode?: string }>();
@@ -40,19 +39,17 @@ const Watch = () => {
       // Note: This depends on the specific implementation of the player
       if (event.data && event.data.type === 'progress' && user && movie) {
         const progress = event.data.progress; // percentage or seconds
-        const progressId = `${user.uid}_${tmdbId}`;
-        
-        await setDoc(doc(db, 'continue_watching', progressId), {
-          userId: user.uid,
+
+        await upsertContinueWatching({
+          userId: user.id,
           tmdbId,
           mediaType,
-          title: movie.title || movie.name,
-          posterPath: movie.poster_path,
-          progress,
+          title: movie.title || movie.name || '',
+          posterPath: movie.poster_path || null,
+          progress: typeof progress === 'number' ? progress : null,
           season: season ? parseInt(season) : null,
           episode: episode ? parseInt(episode) : null,
-          updatedAt: Date.now(),
-        }, { merge: true });
+        });
       }
     };
 
