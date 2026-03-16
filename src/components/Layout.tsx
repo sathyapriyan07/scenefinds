@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Home, Search, Menu, User } from 'lucide-react';
+import { Home, Search, Tv, Film, User } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { clsx, type ClassValue } from 'clsx';
 import { twMerge } from 'tailwind-merge';
@@ -59,8 +59,8 @@ const BottomNav = () => {
   
   const navItems = [
     { label: 'Home', icon: Home, path: '/' },
-    { label: 'Movies', icon: Search, path: '/movies' }, // Placeholder for movies page
-    { label: 'TV Shows', icon: Menu, path: '/tv' }, // Placeholder for tv page
+    { label: 'Movies', icon: Film, path: '/movies' },
+    { label: 'TV Shows', icon: Tv, path: '/tv-shows' },
     { label: 'Search', icon: Search, path: '/search' },
     { label: 'Profile', icon: User, path: '/profile' },
   ];

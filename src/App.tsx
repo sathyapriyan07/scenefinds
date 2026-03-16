@@ -12,6 +12,8 @@ const Watchlist = lazy(() => import('./pages/Watchlist'));
 const Admin = lazy(() => import('./pages/Admin'));
 const Profile = lazy(() => import('./pages/Profile'));
 const PersonDetail = lazy(() => import('./pages/PersonDetail'));
+const Movies = lazy(() => import('./pages/Movies'));
+const TV = lazy(() => import('./pages/TV'));
 
 const Loading = () => (
   <div className="h-screen w-full flex items-center justify-center bg-background">
@@ -31,6 +33,8 @@ export default function App() {
               <Route path="/tv/:id" element={<SeriesDetail />} />
               <Route path="/watch/movie/:id" element={<Watch />} />
               <Route path="/watch/tv/:id/:season/:episode" element={<Watch />} />
+              <Route path="/movies" element={<Movies />} />
+              <Route path="/tv-shows" element={<TV />} />
               <Route path="/search" element={<Search />} />
               <Route path="/watchlist" element={<Watchlist />} />
               <Route path="/profile" element={<Profile />} />
