@@ -15,12 +15,12 @@ export const PosterCard: React.FC<PosterCardProps> = ({ movie }) => {
   return (
     <Link 
       to={`/${movie.media_type || 'movie'}/${movie.id}`} 
-      className="flex-shrink-0 group snap-start w-[30%] sm:w-[22%] md:w-[18%] lg:w-[15%] min-w-[105px] md:min-w-[180px]"
+      className="flex-shrink-0 group snap-start w-[30vw] sm:w-[22vw] md:w-[18vw] lg:w-[14vw] max-w-[260px] min-w-[100px]"
     >
       <motion.div
         whileHover={{ scale: 1.04, y: -5 }}
         transition={{ type: "spring", stiffness: 300, damping: 20 }}
-        className="relative aspect-[2/3] w-full rounded-xl overflow-hidden bg-neutral-900 border border-white/5 shadow-lg"
+        className="relative aspect-[2/3] w-full rounded-2xl overflow-hidden bg-neutral-900 border border-white/5 shadow-lg"
       >
         <img
           src={posterUrl}
