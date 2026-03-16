@@ -170,27 +170,20 @@ export const YouTubeBackdrop: React.FC<Props> = ({ videoKey, title, enabled, onE
       }`}
       aria-label={title}
     >
+      <div className="absolute inset-0 bg-black" />
       <div
-        className="absolute inset-0"
+        ref={containerRef}
+        className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2"
         style={{
-          // Cover the container even though YouTube uses fixed 16:9.
-          width: '100%',
-          height: '100%',
+          // "Cover" math for 16:9 video backgrounds:
+          // width:100vw height:56.25vw and ensure minimums based on viewport height.
+          width: '100vw',
+          height: '56.25vw',
+          minWidth: '177.78vh', // 16/9 * 100vh
+          minHeight: '100vh',
+          transform: 'translate(-50%, -50%) scale(1.06)',
         }}
-      >
-        <div
-          ref={containerRef}
-          className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2"
-          style={{
-            width: '120vw',
-            height: '67.5vw', // 120vw * 9/16
-            minWidth: '120vh',
-            minHeight: '67.5vh',
-            maxWidth: 'none',
-            maxHeight: 'none',
-          }}
-        />
-      </div>
+      />
     </div>
   );
 };

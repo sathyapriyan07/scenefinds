@@ -140,7 +140,7 @@ const MovieDetail = () => {
   return (
     <div className="min-h-screen pb-20 bg-black">
       {/* Hero Banner */}
-      <div className="relative h-[70vh] md:h-[85vh] w-full">
+      <div className="relative w-full h-[65vh] md:h-[80vh] overflow-hidden">
         <div className="absolute inset-0">
           <img
             src={
