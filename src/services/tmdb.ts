@@ -187,4 +187,20 @@ export const tmdbService = {
     const { data } = await tmdb.get(`/collection/${collectionId}`);
     return { ...data, parts: (data.parts || []).map((p: any) => ({ ...p, media_type: 'movie' })) };
   },
+
+  getTrendingAnime: async (): Promise<Movie[]> => {
+    assertTmdbConfigured();
+    const { data } = await tmdb.get('/trending/tv/week');
+    return (data.results || [])
+      .filter((item: any) => item.genre_ids?.includes(16))
+      .map((item: any) => ({ ...item, media_type: 'tv' }));
+  },
+
+  getPopularAnime: async (): Promise<Movie[]> => {
+    assertTmdbConfigured();
+    const { data } = await tmdb.get('/discover/tv', {
+      params: { with_genres: 16, sort_by: 'popularity.desc' },
+    });
+    return (data.results || []).map((item: any) => ({ ...item, media_type: 'tv' }));
+  },
 };

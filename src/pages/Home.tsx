@@ -17,6 +17,8 @@ const Home = () => {
   const [popularTV, setPopularTV] = useState<Movie[]>([]);
   const [action, setAction] = useState<Movie[]>([]);
   const [comedy, setComedy] = useState<Movie[]>([]);
+  const [trendingAnime, setTrendingAnime] = useState<Movie[]>([]);
+  const [popularAnime, setPopularAnime] = useState<Movie[]>([]);
   const [continueWatching, setContinueWatching] = useState<Movie[]>([]);
   const [loading, setLoading] = useState(true);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
@@ -34,15 +36,19 @@ const Home = () => {
           latestData,
           popularTVData,
           actionData,
-          comedyData
+          comedyData,
+          trendingAnimeData,
+          popularAnimeData,
         ] = await Promise.all([
           tmdbService.getTrending(),
           tmdbService.getPopular('movie'),
           tmdbService.getTopRated('movie'),
           tmdbService.getLatest('movie'),
           tmdbService.getPopular('tv'),
-          tmdbService.getMoviesByGenre(28), // Action
-          tmdbService.getMoviesByGenre(35), // Comedy
+          tmdbService.getMoviesByGenre(28),
+          tmdbService.getMoviesByGenre(35),
+          tmdbService.getTrendingAnime(),
+          tmdbService.getPopularAnime(),
         ]);
 
         setTrending(trendingData);
@@ -52,6 +58,8 @@ const Home = () => {
         setPopularTV(popularTVData);
         setAction(actionData);
         setComedy(comedyData);
+        setTrendingAnime(trendingAnimeData);
+        setPopularAnime(popularAnimeData);
 
         if (user) {
           try {
@@ -161,6 +169,8 @@ const Home = () => {
         <MovieRow title="Trending Now" movies={trending} />
         <MovieRow title="Popular Movies" movies={popularMovies} />
         <MovieRow title="Top Rated" movies={topRated} />
+        <MovieRow title="Trending Anime" movies={trendingAnime} />
+        <MovieRow title="Popular Anime" movies={popularAnime} />
         <StudiosSection />
         <CollectionsSection />
         <MovieRow title="Latest Movies" movies={latest} />
