@@ -19,7 +19,7 @@ const Header = () => {
     >
       <div className="flex items-center gap-12">
         <Link to="/" className="flex items-center gap-2 group">
-          <div className="w-10 h-10 bg-white text-black rounded-lg flex items-center justify-center font-black transition-transform group-hover:scale-110">C</div>
+          <img src="/logo.png.png" alt="SceneFinds" className="w-10 h-10 transition-transform group-hover:scale-110" />
           <span className="text-xl font-bold tracking-tighter hidden sm:block font-display">SCENEFINDS</span>
         </Link>
 
