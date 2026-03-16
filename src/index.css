@@ -10,6 +10,16 @@
   --color-border: rgba(255, 255, 255, 0.08);
 }
 
+html {
+  font-size: 15px;
+}
+
+@media (max-width: 640px) {
+  html {
+    font-size: 14px;
+  }
+}
+
 body {
   font-family: var(--font-sans);
   background-color: var(--color-background);
@@ -41,6 +51,28 @@ h1, h2, h3, h4, h5, h6, .font-display {
 
 body {
   padding-bottom: env(safe-area-inset-bottom);
+}
+
+/* Apple TV+ style hero trailer behavior */
+.hero-backdrop {
+  transform: scale(1.04);
+  transition: transform 15s ease-out, opacity 700ms ease;
+}
+
+.hero.is-visible .hero-backdrop {
+  transform: scale(1.08);
+}
+
+.hero-trailer iframe {
+  width: 100%;
+  height: 100%;
+  transform: scale(1.06);
+  transition: transform 15s ease-out;
+  transform-origin: center;
+}
+
+.hero.is-visible .hero-trailer iframe {
+  transform: scale(1.1);
 }
 
 /* Custom Scrollbar */

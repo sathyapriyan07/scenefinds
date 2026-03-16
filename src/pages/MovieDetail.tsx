@@ -4,7 +4,7 @@ import { Play, Plus, Check, Star, Clock, Calendar } from 'lucide-react';
 import { tmdbService } from '../services/tmdb';
 import { Movie, Cast } from '../types';
 import { MovieRow } from '../components/MovieRow';
-import { YouTubeBackdrop } from '../components/YouTubeBackdrop';
+import { CinematicHero } from '../components/CinematicHero';
 import { useAuth } from '../context/AuthContext';
 import { db } from '../firebase';
 import { doc, setDoc, deleteDoc, onSnapshot, collection, query, where } from 'firebase/firestore';
@@ -137,93 +137,71 @@ const MovieDetail = () => {
     );
   }
 
+  const backdropUrl =
+    tmdbService.getImageUrl(movie.backdrop_path, 'original') || 'https://via.placeholder.com/1920x1080?text=No+Backdrop';
+
   return (
     <div className="min-h-screen pb-20 bg-black">
       {/* Hero Banner */}
-      <div className="relative w-full h-[65vh] md:h-[80vh] overflow-hidden">
-        <div className="absolute inset-0">
-          <img
-            src={
-              tmdbService.getImageUrl(movie.backdrop_path, 'original') ||
-              'https://via.placeholder.com/1920x1080?text=No+Backdrop'
-            }
-            alt={movie.title}
-            className="w-full h-full object-cover opacity-50"
-            referrerPolicy="no-referrer"
-            onError={(e) => {
-              (e.target as HTMLImageElement).src = 'https://via.placeholder.com/1920x1080?text=No+Backdrop';
-            }}
-          />
+      <CinematicHero
+        title={movie.title}
+        backdropUrl={backdropUrl}
+        trailerKey={trailerKey}
+        allowTrailerAutoplay={allowTrailerAutoplay}
+        onTrailerError={() => setTrailerKey(null)}
+      >
+        <div className="max-w-3xl">
+          <div className="flex flex-wrap items-center gap-4 text-xs font-bold text-zinc-300 mb-6 uppercase tracking-widest">
+            <div className="flex items-center gap-1 text-white">
+              <Star size={14} fill="currentColor" />
+              <span>{movie.vote_average.toFixed(1)}</span>
+            </div>
+            <span className="w-1 h-1 bg-zinc-600 rounded-full" />
+            <span>{movie.release_date.split('-')[0]}</span>
+            <span className="w-1 h-1 bg-zinc-600 rounded-full" />
+            <span>{movie.runtime} min</span>
+            <span className="w-1 h-1 bg-zinc-600 rounded-full" />
+            <span className="px-1.5 py-0.5 border border-zinc-600 rounded text-[10px]">4K</span>
+          </div>
 
-          {trailerKey && (
-            <YouTubeBackdrop
-              videoKey={trailerKey}
-              title={`${movie.title} trailer`}
-              enabled={allowTrailerAutoplay}
-              onError={() => setTrailerKey(null)}
+          {titleLogoPath ? (
+            <img
+              src={tmdbService.getImageUrl(titleLogoPath, 'original')}
+              alt={movie.title}
+              className="max-h-16 md:max-h-24 max-w-[18rem] md:max-w-[26rem] w-auto mb-5 object-contain drop-shadow-[0_14px_34px_rgba(0,0,0,0.6)]"
+              referrerPolicy="no-referrer"
+              onError={() => {
+                setTitleLogoPath(null);
+              }}
             />
+          ) : (
+            <h1 className="text-5xl md:text-8xl font-bold tracking-tight mb-6 font-display leading-[0.9]">
+              {movie.title}
+            </h1>
           )}
 
-          <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent" />
-          <div className="absolute inset-0 bg-gradient-to-r from-black/60 via-transparent to-transparent" />
-        </div>
-        
-        <div className="absolute inset-0 flex items-end pb-12 md:pb-20">
-          <div className="max-w-[1280px] mx-auto px-4 md:px-6 lg:px-8 w-full overflow-hidden">
-            <div className="max-w-3xl">
-              <div className="flex flex-wrap items-center gap-4 text-xs font-bold text-zinc-300 mb-6 uppercase tracking-widest">
-                <div className="flex items-center gap-1 text-white">
-                  <Star size={14} fill="currentColor" />
-                  <span>{movie.vote_average.toFixed(1)}</span>
-                </div>
-                <span className="w-1 h-1 bg-zinc-600 rounded-full" />
-                <span>{movie.release_date.split('-')[0]}</span>
-                <span className="w-1 h-1 bg-zinc-600 rounded-full" />
-                <span>{movie.runtime} min</span>
-                <span className="w-1 h-1 bg-zinc-600 rounded-full" />
-                <span className="px-1.5 py-0.5 border border-zinc-600 rounded text-[10px]">4K</span>
-              </div>
+          <p className="text-base md:text-lg text-zinc-300 max-w-2xl line-clamp-3 md:line-clamp-none mb-10 font-medium leading-relaxed">
+            {movie.overview}
+          </p>
 
-              {titleLogoPath ? (
-                <img
-                  src={tmdbService.getImageUrl(titleLogoPath, 'original')}
-                  alt={movie.title}
-                  className="max-h-16 md:max-h-24 max-w-[18rem] md:max-w-[26rem] w-auto mb-5 object-contain drop-shadow-[0_14px_34px_rgba(0,0,0,0.6)]"
-                  referrerPolicy="no-referrer"
-                  onError={(e) => {
-                    setTitleLogoPath(null);
-                  }}
-                />
-              ) : (
-                <h1 className="text-5xl md:text-8xl font-bold tracking-tight mb-6 font-display leading-[0.9]">
-                  {movie.title}
-                </h1>
-              )}
-
-              <p className="text-base md:text-lg text-zinc-300 max-w-2xl line-clamp-3 md:line-clamp-none mb-10 font-medium leading-relaxed">
-                {movie.overview}
-              </p>
-
-              <div className="flex items-center gap-3 mt-5">
-                <Link
-                  to={`/watch/movie/${movie.id}`}
-                  className="flex items-center gap-2 bg-white text-black px-4 py-2.5 rounded-lg font-bold text-sm md:text-base hover:bg-zinc-200 transition-all active:scale-95 shadow-2xl shadow-white/10"
-                >
-                  <Play size={18} fill="currentColor" className="md:w-5 md:h-5" />
-                  <span>Play Now</span>
-                </Link>
-                <button
-                  onClick={toggleWatchlist}
-                  className="flex items-center gap-2 bg-neutral-900 border border-neutral-700 text-white px-4 py-2.5 rounded-lg font-bold text-sm md:text-base hover:bg-neutral-800 transition-all active:scale-95"
-                >
-                  {isInWatchlist ? <Check size={18} className="md:w-5 md:h-5" /> : <Plus size={18} className="md:w-5 md:h-5" />}
-                  <span>{isInWatchlist ? 'In Watchlist' : 'Add to Watchlist'}</span>
-                </button>
-              </div>
-            </div>
+          <div className="flex items-center gap-3 mt-5">
+            <Link
+              to={`/watch/movie/${movie.id}`}
+              className="flex items-center gap-2 bg-white text-black px-4 py-2.5 rounded-lg font-bold text-sm md:text-base hover:bg-zinc-200 transition-all active:scale-95 shadow-2xl shadow-white/10"
+            >
+              <Play size={18} fill="currentColor" className="md:w-5 md:h-5" />
+              <span>Play Now</span>
+            </Link>
+            <button
+              onClick={toggleWatchlist}
+              className="flex items-center gap-2 bg-neutral-900 border border-neutral-700 text-white px-4 py-2.5 rounded-lg font-bold text-sm md:text-base hover:bg-neutral-800 transition-all active:scale-95"
+            >
+              {isInWatchlist ? <Check size={18} className="md:w-5 md:h-5" /> : <Plus size={18} className="md:w-5 md:h-5" />}
+              <span>{isInWatchlist ? 'In Watchlist' : 'Add to Watchlist'}</span>
+            </button>
           </div>
         </div>
-      </div>
+      </CinematicHero>
 
       {/* Cast */}
       <div className="py-16">

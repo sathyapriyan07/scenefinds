@@ -161,9 +161,12 @@ export const tmdbService = {
 
   getBestTrailerKey: async (type: 'movie' | 'tv', id: number): Promise<string | null> => {
     const videos = await tmdbService.getVideos(type, id);
-    // Requirement: first TMDB result where type === "Trailer" and site === "YouTube".
-    const first = videos.find((v) => v?.type === 'Trailer' && v?.site === 'YouTube' && v?.key);
-    return first?.key || null;
+    const trailers = videos.filter((v) => v?.type === 'Trailer' && v?.site === 'YouTube' && v?.key);
+    if (trailers.length === 0) return null;
+
+    // Prefer official trailers, otherwise use the first YouTube trailer in TMDB order.
+    const preferred = trailers.find((v) => v.official) ?? trailers[0];
+    return preferred?.key || null;
   },
 
   getImageUrl: (path: string | null | undefined, size: 'w500' | 'original' = 'w500') => {

@@ -42,10 +42,21 @@ type Props = {
   videoKey: string;
   title: string;
   enabled: boolean;
+  active: boolean;
+  shouldLoad: boolean;
+  onPlayingChange?: (playing: boolean) => void;
   onError?: () => void;
 };
 
-export const YouTubeBackdrop: React.FC<Props> = ({ videoKey, title, enabled, onError }) => {
+export const YouTubeBackdrop: React.FC<Props> = ({
+  videoKey,
+  title,
+  enabled,
+  active,
+  shouldLoad,
+  onPlayingChange,
+  onError,
+}) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const playerRef = useRef<any>(null);
   const [ready, setReady] = useState(false);
@@ -54,16 +65,19 @@ export const YouTubeBackdrop: React.FC<Props> = ({ videoKey, title, enabled, onE
   useEffect(() => {
     setReady(false);
     readyRef.current = false;
-  }, [videoKey, enabled]);
+    onPlayingChange?.(false);
+  }, [videoKey, enabled, onPlayingChange]);
 
   useEffect(() => {
     if (!enabled) return;
+    if (!shouldLoad) return;
     if (!videoKey) return;
     if (!containerRef.current) return;
 
     let cancelled = false;
     let timeoutId: number | undefined;
     let didInit = false;
+    let startTimerId: number | undefined;
 
     const destroy = () => {
       try {
@@ -74,7 +88,7 @@ export const YouTubeBackdrop: React.FC<Props> = ({ videoKey, title, enabled, onE
       playerRef.current = null;
     };
 
-    (async () => {
+    const start = async () => {
       try {
         const YT = await loadYouTubeIframeApi();
         if (cancelled) return;
@@ -110,7 +124,8 @@ export const YouTubeBackdrop: React.FC<Props> = ({ videoKey, title, enabled, onE
                   iframe.setAttribute('title', title);
                 }
                 event?.target?.mute?.();
-                event?.target?.playVideo?.();
+                if (active) event?.target?.playVideo?.();
+                else event?.target?.pauseVideo?.();
               } catch {
                 // ignore
               }
@@ -123,6 +138,13 @@ export const YouTubeBackdrop: React.FC<Props> = ({ videoKey, title, enabled, onE
                   if (!cancelled) {
                     readyRef.current = true;
                     setReady(true);
+                    onPlayingChange?.(true);
+                  }
+                } else if (state === YT.PlayerState.PAUSED || state === YT.PlayerState.ENDED) {
+                  if (!cancelled) {
+                    readyRef.current = false;
+                    setReady(false);
+                    onPlayingChange?.(false);
                   }
                 }
               } catch {
@@ -134,6 +156,7 @@ export const YouTubeBackdrop: React.FC<Props> = ({ videoKey, title, enabled, onE
               onError?.();
               setReady(false);
               readyRef.current = false;
+              onPlayingChange?.(false);
               destroy();
             },
           },
@@ -153,36 +176,62 @@ export const YouTubeBackdrop: React.FC<Props> = ({ videoKey, title, enabled, onE
         setReady(false);
         destroy();
       }
-    })();
+    };
+
+    // Lazy start: render poster first, then start the player after initial paint/idle.
+    const ric = (window as any).requestIdleCallback as undefined | ((cb: () => void, opts?: any) => number);
+    if (ric) {
+      startTimerId = ric(() => {
+        if (!cancelled) void start();
+      }, { timeout: 800 });
+    } else {
+      startTimerId = window.setTimeout(() => {
+        if (!cancelled) void start();
+      }, 120);
+    }
 
     return () => {
       cancelled = true;
+      try {
+        const cancelRic = (window as any).cancelIdleCallback as undefined | ((id: number) => void);
+        if (startTimerId && cancelRic) cancelRic(startTimerId);
+        else if (startTimerId) window.clearTimeout(startTimerId);
+      } catch {
+        // ignore
+      }
       if (timeoutId) window.clearTimeout(timeoutId);
       if (didInit) destroy();
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [videoKey, enabled]);
+  }, [videoKey, enabled, shouldLoad]);
+
+  useEffect(() => {
+    if (!enabled) return;
+    const player = playerRef.current;
+    if (!player) return;
+
+    try {
+      player.mute?.();
+      if (active) player.playVideo?.();
+      else player.pauseVideo?.();
+    } catch {
+      // ignore
+    }
+  }, [active, enabled]);
 
   return (
     <div
-      className={`absolute inset-0 pointer-events-none overflow-hidden transition-opacity duration-700 ${
+      className={`hero-trailer absolute inset-0 pointer-events-none overflow-hidden transition-opacity duration-700 ${
         ready ? 'opacity-100' : 'opacity-0'
       }`}
       aria-label={title}
     >
-      <div className="absolute inset-0 bg-black" />
       <div
         ref={containerRef}
-        className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2"
-        style={{
-          // "Cover" math for 16:9 video backgrounds:
-          // width:100vw height:56.25vw and ensure minimums based on viewport height.
-          width: '100vw',
-          height: '56.25vw',
-          minWidth: '177.78vh', // 16/9 * 100vh
-          minHeight: '100vh',
-          transform: 'translate(-50%, -50%) scale(1.06)',
-        }}
+        className={`hero-trailer__player absolute top-1/2 left-1/2 w-[140%] h-[140%] -translate-x-1/2 -translate-y-1/2 ${
+          // Mobile is disabled by CinematicHero, but keep a smaller scale as a safety net.
+          'max-md:w-[120%] max-md:h-[120%]'
+        }`}
       />
     </div>
   );
