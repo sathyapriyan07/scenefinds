@@ -247,14 +247,14 @@ const SeriesDetail = () => {
             </div>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-6">
             {episodes.map((episode) => (
               <Link
                 key={episode.id}
                 to={`/watch/tv/${series.id}/${selectedSeason}/${episode.episode_number}`}
                 className="group block"
               >
-                <div className="aspect-video relative overflow-hidden rounded-2xl border border-white/5 mb-4 bg-neutral-900">
+                <div className="aspect-video relative overflow-hidden rounded-xl border border-white/5 bg-neutral-900">
                   <img
                     src={tmdbService.getImageUrl(episode.still_path) || 'https://via.placeholder.com/500x281?text=No+Preview'}
                     alt={episode.name}
@@ -265,22 +265,22 @@ const SeriesDetail = () => {
                     }}
                   />
                   <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                    <div className="w-14 h-14 bg-white text-black rounded-full flex items-center justify-center shadow-2xl scale-90 group-hover:scale-100 transition-transform duration-500">
-                      <Play size={24} fill="currentColor" />
+                    <div className="w-10 h-10 md:w-14 md:h-14 bg-white text-black rounded-full flex items-center justify-center shadow-2xl scale-90 group-hover:scale-100 transition-transform duration-500">
+                      <Play size={18} fill="currentColor" />
                     </div>
                   </div>
-                  <div className="absolute bottom-3 right-3 bg-black/60 backdrop-blur-md px-2.5 py-1 rounded-lg text-[10px] font-bold tracking-wider">
-                    {episode.runtime || 0} MIN
+                  <div className="absolute bottom-2 right-2 bg-black/70 backdrop-blur-md px-2 py-0.5 rounded-md text-[9px] md:text-[10px] font-bold tracking-wider">
+                    {episode.runtime || 0}m
                   </div>
                 </div>
-                <div>
-                  <div className="flex items-center justify-between mb-2">
-                    <h3 className="font-bold text-base text-white/90 group-hover:text-white transition-colors truncate pr-4">
+                <div className="mt-2 px-0.5">
+                  <div className="flex items-center justify-between mb-1">
+                    <h3 className="font-bold text-xs md:text-sm text-white/90 group-hover:text-white transition-colors truncate pr-2">
                       {episode.name}
                     </h3>
-                    <span className="text-zinc-500 font-bold text-xs shrink-0">E{episode.episode_number}</span>
+                    <span className="text-zinc-500 font-bold text-[10px] shrink-0">E{episode.episode_number}</span>
                   </div>
-                  <p className="text-sm text-zinc-500 line-clamp-2 leading-relaxed font-medium group-hover:text-zinc-400 transition-colors">
+                  <p className="text-[10px] md:text-xs text-zinc-500 line-clamp-2 leading-relaxed group-hover:text-zinc-400 transition-colors">
                     {episode.overview}
                   </p>
                 </div>
