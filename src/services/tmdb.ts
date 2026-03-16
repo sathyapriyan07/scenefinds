@@ -173,4 +173,18 @@ export const tmdbService = {
     if (!path) return undefined;
     return `${IMAGE_BASE_URL}/${size}${path}`;
   },
+
+  getMoviesByStudio: async (companyId: number): Promise<Movie[]> => {
+    assertTmdbConfigured();
+    const { data } = await tmdb.get('/discover/movie', {
+      params: { with_companies: companyId, sort_by: 'popularity.desc' },
+    });
+    return (data.results || []).map((item: any) => ({ ...item, media_type: 'movie' }));
+  },
+
+  getCollection: async (collectionId: number): Promise<{ id: number; name: string; backdrop_path: string | null; parts: Movie[] }> => {
+    assertTmdbConfigured();
+    const { data } = await tmdb.get(`/collection/${collectionId}`);
+    return { ...data, parts: (data.parts || []).map((p: any) => ({ ...p, media_type: 'movie' })) };
+  },
 };

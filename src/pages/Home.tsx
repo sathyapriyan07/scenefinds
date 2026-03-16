@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { Hero } from '../components/Hero';
 import { MovieRow } from '../components/MovieRow';
+import { StudiosSection } from '../components/StudiosSection';
+import { CollectionsSection } from '../components/CollectionsSection';
 import { tmdbIsConfigured, tmdbService } from '../services/tmdb';
 import { Movie } from '../types';
 import { useAuth } from '../context/AuthContext';
@@ -159,6 +161,8 @@ const Home = () => {
         <MovieRow title="Trending Now" movies={trending} />
         <MovieRow title="Popular Movies" movies={popularMovies} />
         <MovieRow title="Top Rated" movies={topRated} />
+        <StudiosSection />
+        <CollectionsSection />
         <MovieRow title="Latest Movies" movies={latest} />
         <MovieRow title="Popular TV Shows" movies={popularTV} />
         <MovieRow title="Action Movies" movies={action} />
