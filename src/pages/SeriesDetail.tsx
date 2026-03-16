@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { Play, Plus, Check, Star, Calendar, ChevronDown } from 'lucide-react';
 import { tmdbService } from '../services/tmdb';
-import { Movie, Episode } from '../types';
+import { Movie, Cast, Episode } from '../types';
 import { MovieRow } from '../components/MovieRow';
 import { CinematicHero } from '../components/CinematicHero';
 import { useAuth } from '../context/AuthContext';
@@ -12,6 +12,7 @@ const SeriesDetail = () => {
   const { id } = useParams<{ id: string }>();
   const { user } = useAuth();
   const [series, setSeries] = useState<Movie | null>(null);
+  const [cast, setCast] = useState<Cast[]>([]);
   const [episodes, setEpisodes] = useState<Episode[]>([]);
   const [similar, setSimilar] = useState<Movie[]>([]);
   const [titleLogoPath, setTitleLogoPath] = useState<string | null>(null);
@@ -38,16 +39,18 @@ const SeriesDetail = () => {
       try {
         setLoading(true);
         setErrorMessage(null);
-        const [seriesData, similarData, logoPath, bestTrailerKey] = await Promise.all([
+        const [seriesData, similarData, logoPath, bestTrailerKey, castData] = await Promise.all([
           tmdbService.getDetails('tv', parseInt(id)),
           tmdbService.getSimilar('tv', parseInt(id)),
           tmdbService.getTitleLogoPath('tv', parseInt(id)),
           tmdbService.getBestTrailerKey('tv', parseInt(id)),
+          tmdbService.getCredits('tv', parseInt(id)),
         ]);
         setSeries(seriesData);
         setSimilar(similarData);
         setTitleLogoPath(logoPath);
         setTrailerKey(bestTrailerKey);
+        setCast(castData);
         
         const episodesData = await tmdbService.getEpisodes(parseInt(id), 1);
         setEpisodes(episodesData);
@@ -227,6 +230,38 @@ const SeriesDetail = () => {
           </div>
         </div>
       </CinematicHero>
+
+      {/* Cast & Crew */}
+      {cast.length > 0 && (
+        <div className="py-10">
+          <div className="max-w-[1280px] mx-auto px-4 md:px-6 lg:px-8 overflow-hidden">
+            <h2 className="text-xl md:text-2xl font-bold tracking-tight mb-6 text-white/90">Cast & Crew</h2>
+            <div className="flex gap-4 overflow-x-auto no-scrollbar scroll-smooth pb-4 snap-x snap-mandatory">
+              {cast.map((person) => (
+                <Link
+                  key={person.id}
+                  to={`/person/${person.id}`}
+                  className="flex-shrink-0 w-24 md:w-32 group snap-start"
+                >
+                  <div className="aspect-square rounded-full overflow-hidden border border-white/5 mb-3 transition-transform duration-500 group-hover:scale-105">
+                    <img
+                      src={tmdbService.getImageUrl(person.profile_path) || 'https://via.placeholder.com/300x300?text=No+Image'}
+                      alt={person.name}
+                      className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-500"
+                      referrerPolicy="no-referrer"
+                      onError={(e) => {
+                        (e.target as HTMLImageElement).src = 'https://via.placeholder.com/300x300?text=No+Image';
+                      }}
+                    />
+                  </div>
+                  <p className="text-xs font-bold text-white mb-1 truncate">{person.name}</p>
+                  <p className="text-[10px] font-medium text-zinc-500 truncate uppercase tracking-tighter">{person.character}</p>
+                </Link>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Episodes Section */}
       <div className="py-16">
