@@ -3,6 +3,7 @@ import { Hero } from '../components/Hero';
 import { MovieRow } from '../components/MovieRow';
 import { StudiosSection } from '../components/StudiosSection';
 import { CollectionsSection } from '../components/CollectionsSection';
+import { StreamingPlatforms } from '../components/StreamingPlatforms';
 import { tmdbIsConfigured, tmdbService } from '../services/tmdb';
 import { Movie } from '../types';
 import { useAuth } from '../context/AuthContext';
@@ -172,6 +173,7 @@ const Home = () => {
         <MovieRow title="Trending Anime" movies={trendingAnime} />
         <MovieRow title="Popular Anime" movies={popularAnime} />
         <StudiosSection />
+        <StreamingPlatforms />
         <CollectionsSection />
         <MovieRow title="Latest Movies" movies={latest} />
         <MovieRow title="Popular TV Shows" movies={popularTV} />

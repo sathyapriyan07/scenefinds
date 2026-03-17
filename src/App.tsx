@@ -16,6 +16,7 @@ const Movies = lazy(() => import('./pages/Movies'));
 const TV = lazy(() => import('./pages/TV'));
 const Studio = lazy(() => import('./pages/Studio'));
 const Collection = lazy(() => import('./pages/Collection'));
+const Platform = lazy(() => import('./pages/Platform'));
 
 const Loading = () => (
   <div className="h-screen w-full flex items-center justify-center bg-background">
@@ -41,6 +42,7 @@ export default function App() {
               <Route path="/watchlist" element={<Watchlist />} />
               <Route path="/studio/:id" element={<Studio />} />
               <Route path="/collection/:id" element={<Collection />} />
+              <Route path="/platform/:id" element={<Platform />} />
               <Route path="/profile" element={<Profile />} />
               <Route path="/person/:id" element={<PersonDetail />} />
               <Route path="/admin/*" element={<Admin />} />

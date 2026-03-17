@@ -182,6 +182,14 @@ export const tmdbService = {
     return (data.results || []).map((item: any) => ({ ...item, media_type: 'movie' }));
   },
 
+  getContentByPlatform: async (providerId: number, type: 'movie' | 'tv' = 'movie'): Promise<Movie[]> => {
+    assertTmdbConfigured();
+    const { data } = await tmdb.get(`/discover/${type}`, {
+      params: { with_watch_providers: providerId, watch_region: 'IN', sort_by: 'popularity.desc' },
+    });
+    return (data.results || []).map((item: any) => ({ ...item, media_type: type }));
+  },
+
   getCollection: async (collectionId: number): Promise<{ id: number; name: string; backdrop_path: string | null; parts: Movie[] }> => {
     assertTmdbConfigured();
     const { data } = await tmdb.get(`/collection/${collectionId}`);
