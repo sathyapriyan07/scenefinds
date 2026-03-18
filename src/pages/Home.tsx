@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Hero } from '../components/Hero';
 import { MovieRow } from '../components/MovieRow';
+import { TopTenRow } from '../components/TopTenRow';
 import { StudiosSection } from '../components/StudiosSection';
 import { CollectionsSection } from '../components/CollectionsSection';
 import { StreamingPlatforms } from '../components/StreamingPlatforms';
@@ -169,14 +170,14 @@ const Home = () => {
         )}
         <MovieRow title="Trending Now" movies={trending} />
         <MovieRow title="Popular Movies" movies={popularMovies} />
-        <MovieRow title="Top Rated" movies={topRated} />
+        <TopTenRow title="Top 10 Movies" movies={topRated} />
+        <TopTenRow title="Top 10 TV Shows" movies={popularTV} />
         <MovieRow title="Trending Anime" movies={trendingAnime} />
         <MovieRow title="Popular Anime" movies={popularAnime} />
         <StudiosSection />
         <StreamingPlatforms />
         <CollectionsSection />
         <MovieRow title="Latest Movies" movies={latest} />
-        <MovieRow title="Popular TV Shows" movies={popularTV} />
         <MovieRow title="Action Movies" movies={action} />
         <MovieRow title="Comedy Movies" movies={comedy} />
       </div>
