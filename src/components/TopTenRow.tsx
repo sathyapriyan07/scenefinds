@@ -20,11 +20,11 @@ export const TopTenRow: React.FC<TopTenRowProps> = ({ title, movies }) => {
 
   if (movies.length === 0) return null;
 
-  const top10 = movies.slice(0, 10);
+  const top10 = movies.slice(0, 20);
 
   return (
-    <section className="py-4 md:py-6 overflow-hidden">
-      <div className="max-w-screen-xl mx-auto px-4">
+    <section className="py-3 md:py-5 overflow-hidden">
+      <div className="max-w-[1280px] mx-auto px-4">
         <div className="flex items-center justify-between mb-3">
           <h2 className="text-lg md:text-2xl font-semibold tracking-tight text-white/90">{title}</h2>
           <ChevronRight size={20} className="text-neutral-400" />

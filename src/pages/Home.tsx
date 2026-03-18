@@ -168,18 +168,18 @@ const Home = () => {
         {continueWatching.length > 0 && (
           <MovieRow title="Continue Watching" movies={continueWatching} />
         )}
-        <MovieRow title="Trending Now" movies={trending} />
-        <MovieRow title="Popular Movies" movies={popularMovies} />
+        <TopTenRow title="Trending Now" movies={trending} />
         <TopTenRow title="Top 10 Movies" movies={topRated} />
         <TopTenRow title="Top 10 TV Shows" movies={popularTV} />
-        <MovieRow title="Trending Anime" movies={trendingAnime} />
-        <MovieRow title="Popular Anime" movies={popularAnime} />
+        <TopTenRow title="Popular Movies" movies={popularMovies} />
+        <TopTenRow title="Trending Anime" movies={trendingAnime} />
+        <TopTenRow title="Popular Anime" movies={popularAnime} />
         <StudiosSection />
         <StreamingPlatforms />
         <CollectionsSection />
-        <MovieRow title="Latest Movies" movies={latest} />
-        <MovieRow title="Action Movies" movies={action} />
-        <MovieRow title="Comedy Movies" movies={comedy} />
+        <TopTenRow title="Latest Movies" movies={latest} />
+        <TopTenRow title="Action Movies" movies={action} />
+        <TopTenRow title="Comedy Movies" movies={comedy} />
       </div>
     </div>
   );
